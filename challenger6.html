@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+  <html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrobi - Zeno's Paradox: Achilles vs Tortoise</title>
+    <style>
+      body {
+        text-align: center;
+        padding-top:6.25rem;
+      }
+      canvas {
+        border: 0.125rem solid #333;
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Zeno's Paradox: Achilles vs Tortoise</h1>
+    <canvas id="paradoxZenos" width="900" height="350"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.1/gsap.min.js"></script>
+    <script>
+      const canvas = document.getElementById("paradoxZenos");
+      const ctx = canvas.getContext("2d");
+
+      const tortoiseSpeed = 3;
+      const achillesSpeed = 4;
+      const tortoiseStartPosition = 150;
+      const achillesStartPosition = 0;
+      const finishLineX = 850;
+
+      let tortoisePosition = tortoiseStartPosition;
+      let achillesPosition = achillesStartPosition;
+
+      /**
+      * Draw the race track and the finish line.
+      */
+      const drawRaceTrack = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#d0e7ff";
+        ctx.fillRect(0, 50, canvas.width, 20);
+        ctx.strokeStyle = "#333";
+        ctx.beginPath();
+        ctx.moveTo(finishLineX, 0);
+        ctx.lineTo(finishLineX, canvas.height);
+        ctx.stroke();
+      }
+
+      /**
+      * Draw the racers (Achilles and the Tortoise) on the track.
+      */
+      const drawRacers = () => {
+        ctx.fillStyle = "#8bc34a";
+        ctx.beginPath();
+        ctx.arc(tortoisePosition, 60, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#333";
+        ctx.font = "16px Arial";
+        ctx.fillText("Tortoise", tortoisePosition - 25, 50);
+
+        ctx.fillStyle = "#2196f3";
+        ctx.beginPath();
+        ctx.arc(achillesPosition, 120, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#333";
+        ctx.fillText("Achilles", achillesPosition - 25, 110);
+      }
+
+      /**
+      * Update the positions of both racers.
+      */
+      const updatePositions = () => {
+        if (tortoisePosition < finishLineX) {
+          tortoisePosition += tortoiseSpeed;
+        }
+
+        if (achillesPosition < finishLineX) {
+          achillesPosition += achillesSpeed;
+        }
+
+        if (achillesPosition >= tortoisePosition) {
+          achillesPosition = tortoisePosition;
+        }
+
+        if (achillesPosition >= finishLineX) {
+          achillesPosition = finishLineX;
+          tortoisePosition = finishLineX;
+        }
+      }
+
+      /**
+      * Main function to animate the race.
+      */
+      const animateRace = () => {
+        drawRaceTrack();
+        drawRacers();
+        updatePositions();
+
+        gsap.to(achillesPosition, {
+          duration: 0.1,
+          x: achillesPosition + achillesSpeed,
+          onUpdate: drawRacers
+        });
+
+        gsap.to(tortoisePosition, {
+          duration: 0.1,
+          x: tortoisePosition + tortoiseSpeed,
+          onUpdate: drawRacers
+        });
+
+        if (achillesPosition < finishLineX) {
+          requestAnimationFrame(animateRace);
+        }
+      }
+
+      animateRace();
+    </script>
+
+  </body>
+  </html>
